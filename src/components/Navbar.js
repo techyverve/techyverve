@@ -76,7 +76,7 @@ const Navbar = () => {
                     href={item.href}
                     className={`relative px-3 py-2 rounded-md text-sm lg:text-base font-medium transition-all duration-200 hover:scale-105 group ${
                       isScrolled
-                        ? "bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 bg-clip-text text-transparent hover:bg-white/10"
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:bg-white/10"
                         : "text-black hover:bg-white/10 hover:text-black"
                     }`}
                   >

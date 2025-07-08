@@ -8,35 +8,42 @@ const Projects = () => {
       title: "Billing Software",
       description: "Comprehensive billing and invoice management system with automated features",
       image: "/api/placeholder/400/250",
-      technologies: ["React", "Node.js", "MongoDB"],
+      technologies: ["React", "Node.js", "MongoDB","Redux"],
+      category: "Software"
+    },
+    {
+      title: "Pigmy Software",
+      description: "Comprehensive billing and invoice management system with automated features",
+      image: "/api/placeholder/400/250",
+      technologies: ["Next", "Node.js", "MongoDB","Redux"],
       category: "Software"
     },
     {
       title: "Gym Management Software",
       description: "Complete gym management solution with member tracking and payment systems",
       image: "/api/placeholder/400/250",
-      technologies: ["Next.js", "PostgreSQL", "Stripe"],
+      technologies: ["React.js", "Node.js", "Mongodb"],
       category: "Software"
     },
     {
       title: "SN Mastermind Website",
       description: "Professional corporate website with modern design and responsive layout",
       image: "/api/placeholder/400/250",
-      technologies: ["React", "Tailwind CSS", "Framer Motion"],
+      technologies: ["Next", "Tailwind CSS", "Framer Motion"],
       category: "Website"
     },
     {
       title: "TechyVerve Website",
       description: "Our own company website showcasing our capabilities and services",
       image: "/api/placeholder/400/250",
-      technologies: ["Next.js", "TypeScript", "Tailwind CSS"],
+      technologies: ["Next", "Tailwind CSS", "Framer Motion"],
       category: "Website"
     },
     {
       title: "Portfolio Websites",
       description: "Custom portfolio websites for professionals and creatives",
       image: "/api/placeholder/400/250",
-      technologies: ["React", "GSAP", "CSS3"],
+      technologies: ["HTML", "CSS3", "JS"],
       category: "Website"
     }
   ];
@@ -55,7 +62,7 @@ const Projects = () => {
           {projects.map((project, index) => (
             <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
               <div className="h-48 bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center">
-                <div className="text-blue-600 font-semibold text-lg">{project.title}</div>
+                <div className="text-blue-600 font-semibold text-lg">{<img src='.'/>}</div>
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">

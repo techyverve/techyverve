@@ -45,7 +45,7 @@ const About = () => {
           <div className="bg-gradient-to-br from-blue-50 to-indigo-100 p-8 rounded-xl">
             <div className="grid grid-cols-2 gap-8 text-center">
               <div>
-                <div className="text-4xl font-bold text-blue-600 mb-2">50+</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">10+</div>
                 <div className="text-gray-600">Projects Completed</div>
               </div>
               <div>
@@ -57,7 +57,7 @@ const About = () => {
                 <div className="text-gray-600">Support Available</div>
               </div>
               <div>
-                <div className="text-4xl font-bold text-blue-600 mb-2">3+</div>
+                <div className="text-4xl font-bold text-blue-600 mb-2">1+</div>
                 <div className="text-gray-600">Years Experience</div>
               </div>
             </div>
