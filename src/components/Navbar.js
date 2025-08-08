@@ -3,33 +3,47 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import Image from "next/image";
+import logo from "../resources/logo.png"; // Correct import for local image
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [textColor, setTextColor] = useState("white");
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       setIsScrolled(scrollPosition > 50);
 
-      // Check which section is currently in view
-      const sections = ["home", "about", "services", "projects", "contact"];
-      const sectionElements = sections.map(id => document.getElementById(id));
+      const sections = ["home", "about", "services", "contact"];
+      const sectionElements = sections.map((id) => document.getElementById(id));
+
+      // Default to home if we're at the top
+      let currentSection = "home";
       
       for (let i = sections.length - 1; i >= 0; i--) {
         const element = sectionElements[i];
         if (element) {
           const rect = element.getBoundingClientRect();
           if (rect.top <= 100) {
-            setActiveSection(sections[i]);
+            currentSection = sections[i];
             break;
           }
         }
       }
+      
+      setActiveSection(currentSection);
+      
+      // Set text color based on current section
+      // White for home section, black for all other sections
+      setTextColor(currentSection === "home" ? "white" : "black");
     };
 
+    // Call initially to set correct state
+    handleScroll();
+    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -38,65 +52,63 @@ const Navbar = () => {
     { name: "Home", href: "#home", id: "home" },
     { name: "About Us", href: "#about", id: "about" },
     { name: "Services", href: "#services", id: "services" },
-    // { name: "Projects", href: "#projects", id: "projects" },
     { name: "Contact Us", href: "#contact", id: "contact" },
     { name: "Career", href: "/career", id: "career" },
   ];
 
   const isActive = (itemId) => {
-    if (itemId === "career") return false; // Career is external link
+    if (itemId === "career") return false;
     return activeSection === itemId;
   };
 
   return (
-    <>
-      {/* Navbar */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
+    <nav className="fixed top-4 left-50 right-50 z-50">
+      <div
+        className={`transition-all duration-300 ease-in-out rounded-4xl ${
           isScrolled
             ? "bg-white/0 backdrop-blur-sm border-b border-white/20 shadow-lg"
             : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl pt- -m-4 mx-auto px-4 py-2 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="max-w-5xl mx-auto px-3 py-1 sm:px-4 lg:px-6">
+          <div className="flex items-center justify-between h-12 lg:h-14">
             {/* Logo */}
-            <div className="bg-none text-center py-8">
-              <h1 className="font-logo text-sm sm:text-lg lg:text-xl tracking-widest bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-700 bg-clip-text text-transparent uppercase">
-                TechyVerve
-              </h1>
+            <div className="flex items-center space-x-2">
+              <Image
+                src={logo}
+                alt="TechyVerve Logo"
+                className="object-contain"
+                width={40}
+                priority
+              />
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-8">
+              <div className="ml-6 flex items-baseline space-x-6">
                 {navItems.map((item) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`relative px-3 py-2 rounded-md text-sm lg:text-base font-medium transition-all duration-200 hover:scale-105 group ${
-                      isScrolled
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:bg-white/10"
-                        : "text-black hover:bg-white/10 hover:text-black"
+                    className={`relative px-2 py-1 rounded-xl text-xs lg:text-sm font-medium transition-all duration-200 hover:scale-105 group ${
+                      textColor === "white"
+                        ? "text-white hover:bg-white/10 hover:text-white"
+                        : "text-black hover:bg-black/10 hover:text-black"
                     }`}
                   >
                     {item.name}
-                    
-                    {/* Bottom border animation */}
                     <span
-                      className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 transform transition-transform duration-300 ease-out ${
+                      className={`absolute bottom-0 left-0 w-full h-0.5 bg-white transform transition-transform duration-300 ease-out rounded-full ${
                         isActive(item.id)
                           ? "scale-x-100"
                           : "scale-x-0 group-hover:scale-x-100"
                       }`}
                     />
-                    
-                    {/* Hover glow effect */}
                     <span
-                      className={`absolute inset-0 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-                        isScrolled
-                          ? "bg-gradient-to-r from-emerald-500/10 via-teal-600/10 to-cyan-600/10"
-                          : "bg-gradient-to-r from-emerald-500/10 via-teal-600/10 to-cyan-600/10"
+                      className={`absolute bottom-0 left-0 w-full h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full ${
+                        textColor === "white" 
+                          ? "bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300"
+                          : "bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700"
                       }`}
                     />
                   </Link>
@@ -108,10 +120,10 @@ const Navbar = () => {
             <div className="md:hidden">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`p-2 rounded-md transition-colors duration-200 ${
-                  isScrolled
-                    ? "text-gray-900 hover:bg-gray-100"
-                    : "text-gray-900 hover:bg-white/10"
+                className={`p-2 rounded-xl transition-colors duration-200 ${
+                  textColor === "white"
+                    ? "text-white hover:bg-white/10"
+                    : "text-black hover:bg-black/10"
                 }`}
               >
                 {isMobileMenuOpen ? (
@@ -131,28 +143,35 @@ const Navbar = () => {
                 : "max-h-0 opacity-0 overflow-hidden"
             }`}
           >
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white/10 backdrop-blur-sm border-t border-white/20 rounded-b-lg">
+            <div className={`px-2 pt-2 pb-3 space-y-1 backdrop-blur-sm border-t rounded-b-xl ${
+              textColor === "white" 
+                ? "bg-white/10 border-white/20" 
+                : "bg-black/10 border-black/20"
+            }`}>
               {navItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`relative block px-3 py-2 rounded-md text-base font-medium transition-all duration-200 group ${
-                    isScrolled
-                      ? "text-gray-900 hover:bg-gray-100 hover:text-purple-600"
-                      : "text-gray-900 hover:bg-white/20 hover:text-blue-300"
-                  } ${
-                    isActive(item.id) ? "bg-white/20" : ""
-                  }`}
+                  className={`relative block px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 group ${
+                    textColor === "white"
+                      ? "text-white hover:bg-white/20 hover:text-white"
+                      : "text-black hover:bg-black/20 hover:text-black"
+                  } ${isActive(item.id) ? (textColor === "white" ? "bg-white/20" : "bg-black/20") : ""}`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
-                  
-                  {/* Mobile bottom border animation */}
                   <span
-                    className={`absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 transform transition-transform duration-300 ease-out ${
+                    className={`absolute bottom-0 left-3 right-3 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 transform transition-transform duration-300 ease-out rounded-full ${
                       isActive(item.id)
                         ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-100"
+                        : "scale-x-0"
+                    }`}
+                  />
+                  <span
+                    className={`absolute bottom-0 left-3 right-3 h-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full ${
+                      textColor === "white"
+                        ? "bg-gradient-to-r from-emerald-300 via-teal-300 to-cyan-300"
+                        : "bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-700"
                     }`}
                   />
                 </Link>
@@ -160,8 +179,8 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-      </nav>
-    </>
+      </div>
+    </nav>
   );
 };
 

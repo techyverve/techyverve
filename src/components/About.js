@@ -1,7 +1,7 @@
 "use client";
 
-import React from 'react';
-import { CheckCircle, Users, Target, Zap, Shield, Award, Code, Palette } from 'lucide-react';
+import React from "react";
+import { CheckCircle, Users, Target, Zap, Shield, Award, Code, Palette } from "lucide-react";
 
 const About = () => {
   const values = [
@@ -49,7 +49,7 @@ const About = () => {
   ];
 
   return (
-    <div id='about' className="bg-white py-20">
+    <div id="about" className="bg-white py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">About TechyVerve</h2>

@@ -8,13 +8,27 @@ import Services from "@/components/Services";
 
 export default function Main() {
   return (
-    <div>
+    <div className="w-full">
       <Navbar/>
-      <Home/>
-      <About/>
-      <Services/>
+      {/* Full viewport height with black background */}
+      <div className="w-full h-screen bg-black relative">
+        <Home
+          amplitude={1}
+          distance={0}
+          enableMouseInteraction={true}
+        />
+      </div>
+      {/* Ensure About starts after Home completes */}
+      <div className="w-full">
+        <About/>
+      </div>
+      <div className="w-full">
+        <Services/>
+      </div>
       {/* <Projects/> */}
-      <Contact/>
+      <div className="w-full">
+        <Contact/>
+      </div>
       <Footer/>
     </div>
   );
