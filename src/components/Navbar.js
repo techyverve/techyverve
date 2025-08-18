@@ -118,6 +118,28 @@ const Navbar = () => {
             </div>
           </div>
         </div>
+
+        {/* Mobile Menu (only visible when open) */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden px-4 pb-4">
+            <div className="flex flex-col space-y-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)} // close after click
+                  className={`block px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
+                    textColor === "white"
+                      ? "text-white hover:bg-white/10"
+                      : "text-black hover:bg-black/10"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
