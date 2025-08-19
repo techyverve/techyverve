@@ -52,7 +52,7 @@ const ServicesPage = () => {
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed font-sans">
             From cutting-edge web applications to mobile solutions and
-            everything in between, you'll never need to look anywhere else for
+            everything in between, you will never need to look anywhere else for
             your development needs.
           </p>
           <div className="hero-cta">

@@ -29,7 +29,6 @@ const Contact = ({ onClose }) => {
       subject
     )}&body=${encodeURIComponent(body)}`;
 
-    // Redirect to user's email client
     window.location.href = mailtoLink;
 
     onClose(); // close popup after redirect
@@ -61,7 +60,7 @@ const Contact = ({ onClose }) => {
         <div className="mb-6">
           <h3 className="text-3xl font-bold text-black mb-2">Get in Touch</h3>
           <p className="text-gray-500 text-sm">
-            We'd love to hear from you. Send us a message and we'll respond as
+            We would love to hear from you. Send us a message and we will respond as
             soon as possible.
           </p>
         </div>
