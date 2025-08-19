@@ -49,7 +49,7 @@ const Projects = () => {
       : projects.filter((p) => p.category === filter);
 
   return (
-    <section id="projects" className="bg-white text-black py-20">
+    <section id="projects" className="bg-white text-black py-20 mt- -m-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="text-4xl font-bold text-center mb-12">My Projects</h2>
 
