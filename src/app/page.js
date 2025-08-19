@@ -25,11 +25,8 @@ export default function Main() {
       <div className="w-full">
         <Services/>
       </div>
-      {/* <div className="w-full">
-        <Projects/>
-      </div> */}
       <div className="w-full">
-        <Contact/>
+        <Projects/>
       </div>
       <Footer/>
     </div>
