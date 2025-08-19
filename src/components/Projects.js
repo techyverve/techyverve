@@ -1,145 +1,85 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { createPortal } from "react-dom";
 import bill from "../resources/bill.png";
 import pigmy from "../resources/pigmy.png";
 import gym from "../resources/gym.png";
 import snMastermind from "../resources/sn-mastermind.png";
 import laptop from "../resources/laptop.png";
 
-const Projects = () => {
-  const [filter, setFilter] = useState("All");
-
-  const projects = [
+const projects = [
   {
     title: "Billing Software",
-    description: "Comprehensive billing and invoice management system with automated features",
+    description: "Comprehensive billing & invoice system with automated features and analytics.",
+    details:
+      "This project supports GST billing, invoice tracking, customer database management, and financial reporting. It also includes role-based authentication and data visualization dashboards for admins.",
     image: bill,
-    technologies: ["React", "Node.js", "MongoDB","Redux"],
-    category: "Software"
+    technologies: ["React", "Node.js", "MongoDB", "Redux"],
+    liveUrl: "https://mybillingapp.example.com",
+    github: "https://github.com/yourname/billing-app",
   },
   {
     title: "Pigmy Software",
-    description: "Comprehensive billing and invoice management system with automated features",
+    description: "Automated recurring deposit collection & real-time reporting for finance sectors.",
+    details:
+      "Designed for financial agents and institutions to simplify RD collections. Features include automated notifications, secure transactions, and advanced analytics with export options.",
     image: pigmy,
-    technologies: ["Next", "Node.js", "MongoDB","Redux"],
-    category: "Software"
+    technologies: ["Next.js", "Node.js", "MongoDB", "Redux"],
   },
   {
     title: "Gym Management Software",
-    description: "Complete gym management solution with member tracking and payment systems",
+    description: "Membership, attendance, payments & trainer management in one platform.",
+    details:
+      "Helps gym owners manage memberships, workout schedules, trainer assignments, and payment collections. Includes attendance tracking and real-time performance analytics.",
     image: gym,
-    technologies: ["React.js", "Node.js", "Mongodb"],
-    category: "Software"
+    technologies: ["React.js", "Node.js", "MongoDB"],
   },
   {
     title: "SN Mastermind Website",
-    description: "Professional corporate website with modern design and responsive layout",
+    description: "Corporate website featuring modern animations and responsive design.",
+    details:
+      "Built for a corporate business with modern UI/UX, responsive layouts, SEO optimization, and smooth animations using Framer Motion.",
     image: snMastermind,
     technologies: ["Next", "Tailwind CSS", "Framer Motion"],
-    category: "Website"
   },
 ];
 
+function useScrollLock(locked) {
+  useEffect(() => {
+    document.body.style.overflow = locked ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [locked]);
+}
 
-  const filteredProjects =
-    filter === "All"
-      ? projects
-      : projects.filter((p) => p.category === filter);
+export default function Projects() {
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [mounted, setMounted] = useState(false);
+  const scrollRef = useRef();
+
+  useEffect(() => setMounted(true), []);
+
+  useScrollLock(Boolean(selectedProject));
+  useEffect(() => {
+    if (selectedProject) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+  }, [selectedProject]);
+
+  useEffect(() => {
+    if (!selectedProject) return;
+    const onKey = (e) => e.key === "Escape" && setSelectedProject(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedProject]);
 
   return (
-    <section id="projects" className="bg-white text-black py-20 mt- -m-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-4xl font-bold text-center mb-12">My Projects</h2>
-
-        {/* Filter buttons */}
-        <div className="flex justify-center mb-12 space-x-4">
-          {["All", "Software", "Mobile App"].map((cat) => (
-            <button
-              key={cat}
-              className={`px-4 py-2 rounded-lg ${
-                filter === cat
-                  ? "bg-blue-600 text-black"
-                  : "bg-gray-700 text-black-300 hover:bg-gray-600"
-              }`}
-              onClick={() => setFilter(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Projects list */}
-        <div className="space-y-20">
-          {filteredProjects.map((project, idx) => (
-            <div
-              key={idx}
-              className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
-            >
-              {/* LEFT: Laptop Mockup */}
-              <div className="relative w-full h-96 flex items-center justify-center">
-                <Image
-                  src={laptop}
-                  alt="Laptop Mockup"
-                  className="z-10"
-                  fill
-                  style={{ objectFit: "contain" }}
-                />
-
-                {/* Sliding project screenshot */}
-                <div className="absolute top-[18%] left-[12%] w-[76%] h-[60%] overflow-hidden rounded-md">
-                  <div className="animate-slide">
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      width={800}
-                      height={600}
-                      className="object-top"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* RIGHT: Info (Always shown) */}
-              <div>
-                <h3 className="text-3xl font-semibold mb-4">
-                  {project.title}
-                </h3>
-                <p className="text-black-300 mb-6">{project.description}</p>
-
-                <div className="flex flex-wrap gap-3">
-                  {project.technologies.map((tech, i) => (
-                    <span
-                      key={i}
-                      className="bg-blue-600 text-black text-sm px-3 py-1 rounded-full"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Tailwind sliding animation */}
-      <style jsx>{`
-        .animate-slide {
-          animation: slide 8s linear infinite alternate;
-        }
-        @keyframes slide {
-          0% {
-            transform: translateY(0);
-          }
-          100% {
-            transform: translateY(-40%);
-          }
-        }
-      `}</style>
-    </section>
+      <div>hello</div>
   );
-};
-
-export default Projects;
+}
