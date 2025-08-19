@@ -48,7 +48,6 @@ const Navbar = () => {
     { name: "Home", href: "#home", id: "home" },
     { name: "About Us", href: "#about", id: "about" },
     { name: "Services", href: "#services", id: "services" },
-    { name: "Contact Us", href: "#contact", id: "contact" },
     { name: "Career", href: "/career", id: "career" },
   ];
 
@@ -88,7 +87,11 @@ const Navbar = () => {
                     key={item.name}
                     href={item.href}
                     className={`relative px-3 py-1 rounded-xl text-sm font-medium transition-all duration-200 hover:scale-105 group ${
-                      textColor === "white"
+                      isActive(item.id)
+                        ? textColor === "white"
+                          ? "text-white bg-white/20 shadow-lg"
+                          : "text-black bg-black/20 shadow-lg"
+                        : textColor === "white"
                         ? "text-white hover:bg-white/10"
                         : "text-black hover:bg-black/10"
                     }`}
@@ -129,7 +132,11 @@ const Navbar = () => {
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)} // close after click
                   className={`block px-3 py-2 rounded-xl text-base font-medium transition-all duration-200 ${
-                    textColor === "white"
+                    isActive(item.id)
+                      ? textColor === "white"
+                        ? "text-white bg-white/20"
+                        : "text-black bg-black/20"
+                      : textColor === "white"
                       ? "text-white hover:bg-white/10"
                       : "text-black hover:bg-black/10"
                   }`}

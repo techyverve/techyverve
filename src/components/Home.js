@@ -1,7 +1,7 @@
 "use client";
-
-import { useEffect, useRef, useCallback, useMemo } from "react";
+import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 import { Renderer, Program, Mesh, Triangle, Color } from "ogl";
+import Contact from "./Contact";
 
 const vertexShader = `
 attribute vec2 position;
@@ -14,6 +14,7 @@ void main() {
 `;
 
 const fragmentShader = `
+// ... (your existing fragment shader, unchanged)
 precision highp float;
 
 uniform float iTime;
@@ -87,7 +88,7 @@ float lineFn(vec2 st, float width, float perc, float offset, vec2 mouse, float t
     );
 
     return clamp(
-        (line_start - line_end) * (1.0 - smoothstep(0.0, 1.0, pow(perc, 0.3))),
+        (line_start - line_end) * (1.0 - smoothstep(0.0, 1.0, pow(perc, 0.3)) ),
         0.0,
         1.0
     );
@@ -137,19 +138,33 @@ const Home = ({
   const isInitializedRef = useRef(false);
   const mouseStateRef = useRef({
     current: [0.5, 0.5],
-    target: [0.5, 0.5]
+    target: [0.5, 0.5],
   });
+
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const colorArray = useMemo(() => [...color], [color]);
 
+  // ✅ Lock/unlock scroll when popup is open
+  useEffect(() => {
+    if (isPopupOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isPopupOpen]);
+
   const handleResize = useCallback(() => {
     if (!containerRef.current || !rendererRef.current || !programRef.current) return;
-    
+
     const { clientWidth, clientHeight } = containerRef.current;
-    
+
     const canvas = rendererRef.current.gl.canvas;
     if (canvas.width === clientWidth && canvas.height === clientHeight) return;
-    
+
     rendererRef.current.setSize(clientWidth, clientHeight);
     programRef.current.uniforms.iResolution.value.r = clientWidth;
     programRef.current.uniforms.iResolution.value.g = clientHeight;
@@ -168,47 +183,50 @@ const Home = ({
     mouseStateRef.current.target = [0.5, 0.5];
   }, []);
 
-  const animate = useCallback((t) => {
-    if (!programRef.current) return;
+  const animate = useCallback(
+    (t) => {
+      if (!programRef.current) return;
 
-    if (enableMouseInteraction) {
-      const smoothing = 0.05;
-      const mouse = mouseStateRef.current;
-      mouse.current[0] += smoothing * (mouse.target[0] - mouse.current[0]);
-      mouse.current[1] += smoothing * (mouse.target[1] - mouse.current[1]);
-      programRef.current.uniforms.uMouse.value[0] = mouse.current[0];
-      programRef.current.uniforms.uMouse.value[1] = mouse.current[1];
-    } else {
-      programRef.current.uniforms.uMouse.value[0] = 0.5;
-      programRef.current.uniforms.uMouse.value[1] = 0.5;
-    }
+      if (enableMouseInteraction) {
+        const smoothing = 0.05;
+        const mouse = mouseStateRef.current;
+        mouse.current[0] += smoothing * (mouse.target[0] - mouse.current[0]);
+        mouse.current[1] += smoothing * (mouse.target[1] - mouse.current[1]);
+        programRef.current.uniforms.uMouse.value[0] = mouse.current[0];
+        programRef.current.uniforms.uMouse.value[1] = mouse.current[1];
+      } else {
+        programRef.current.uniforms.uMouse.value[0] = 0.5;
+        programRef.current.uniforms.uMouse.value[1] = 0.5;
+      }
 
-    programRef.current.uniforms.iTime.value = t * 0.001;
+      programRef.current.uniforms.iTime.value = t * 0.001;
 
-    if (rendererRef.current && meshRef.current) {
-      rendererRef.current.render({ scene: meshRef.current });
-    }
+      if (rendererRef.current && meshRef.current) {
+        rendererRef.current.render({ scene: meshRef.current });
+      }
 
-    animationFrameId.current = requestAnimationFrame(animate);
-  }, [enableMouseInteraction]);
+      animationFrameId.current = requestAnimationFrame(animate);
+    },
+    [enableMouseInteraction]
+  );
 
   const initializeWebGL = useCallback(() => {
     if (!containerRef.current || isInitializedRef.current) return;
 
     const container = containerRef.current;
-    
+
     try {
-      const renderer = new Renderer({ 
+      const renderer = new Renderer({
         alpha: true,
         antialias: false,
-        powerPreference: "high-performance"
+        powerPreference: "high-performance",
       });
-      
+
       const gl = renderer.gl;
       gl.clearColor(0, 0, 0, 0);
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      
+
       container.appendChild(gl.canvas);
 
       const geometry = new Triangle(gl);
@@ -246,7 +264,6 @@ const Home = ({
 
       handleResize();
       animationFrameId.current = requestAnimationFrame(animate);
-
     } catch (error) {
       console.error("Failed to initialize WebGL:", error);
     }
@@ -254,7 +271,7 @@ const Home = ({
 
   useEffect(() => {
     if (!programRef.current) return;
-    
+
     programRef.current.uniforms.uColor.value = new Color(...colorArray);
     programRef.current.uniforms.uAmplitude.value = amplitude;
     programRef.current.uniforms.uDistance.value = distance;
@@ -282,7 +299,7 @@ const Home = ({
         if (containerRef.current.contains(canvas)) {
           containerRef.current.removeChild(canvas);
         }
-        
+
         const ext = rendererRef.current.gl.getExtension("WEBGL_lose_context");
         if (ext) ext.loseContext();
       }
@@ -294,18 +311,18 @@ const Home = ({
     };
   }, [handleResize, handleMouseMove, handleMouseLeave, enableMouseInteraction]);
 
-return (
-  <>
-    {/* DM Sans Font Import */}
-    <style>
-      {`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');`}
-    </style>
-    
-    <div
-      ref={containerRef}
-      className={`w-full h-screen relative overflow-hidden ${className}`}
-      style={{
-        background: `
+  return (
+    <>
+      {/* DM Sans Font Import */}
+      <style>
+        {`@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');`}
+      </style>
+
+      <div
+        ref={containerRef}
+        className={`w-full h-screen relative overflow-hidden ${className}`}
+        style={{
+          background: `
           linear-gradient(135deg, 
             #000000 0%, 
             #111111 25%, 
@@ -314,127 +331,65 @@ return (
             #000000 100%
           )
         `,
-        fontFamily: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
-        ...style
-      }}
-      {...rest}
-    >
-      {/* Hero Content Overlay */}
-      <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 z-10">
-        <h1 className="mb-8 tracking-tight leading-tight">
-          <div 
-            className="text-base md:text-lg lg:text-xl text-gray-300 font-light mb-4 opacity-90"
-            style={{ 
-              textShadow: '0 2px 8px rgba(0,0,0,0.5)',
-              letterSpacing: '0.1em',
-              fontWeight: '300'
-            }}
-          >
-            Welcome to
-          </div>
-          <div 
-            className="text-6xl md:text-8xl lg:text-9xl font-black bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              textShadow: '0 2px 7px rgba(255,255,255,0.2)',
-              filter: 'drop-shadow(0 0 30px rgba(255,255,255,0.2))',
-              fontWeight: '800'
-            }}
-          >
-            TechyVerve
-          </div>
-        </h1>
-        
-        <p 
-          className="text-lg md:text-xl lg:text-2xl text-gray-200 mb-12 max-w-4xl mx-auto leading-relaxed font-light opacity-95"
-          style={{ 
-            fontFamily: "'DM Sans', sans-serif",
-            textShadow: '0 2px 10px rgba(0,0,0,0.7)',
-            lineHeight: '1.6',
-            fontWeight: '400'
-          }}
-        >
-          We create innovative software solutions and stunning websites that help businesses{" "}
-          <span 
-            className="text-white font-medium"
-            style={{ 
-              textShadow: '0 0 20px rgba(255,255,255,0.5)',
-              fontWeight: '600'
-            }}
-          >
-            thrive
-          </span>{" "}
-          in the digital world
-        </p>
-        
-        <div className="flex flex-col sm:flex-row gap-6 justify-center">
-          <button
-            onClick={() => {
-              const element = document.getElementById("projects");
-              if (element) {
-                element.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-            className="group relative bg-white text-black px-10 py-4 rounded-xl font-medium text-lg hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl hover:shadow-white/20 flex items-center justify-center gap-3"
-            style={{ 
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: '600',
-              boxShadow: '0 10px 40px rgba(255,255,255,0.1)'
-            }}
-          >
-            View Our Work
-            <svg 
-              className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              viewBox="0 0 24 24"
+          fontFamily:
+            "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
+          ...style,
+        }}
+        {...rest}
+      >
+        {/* Hero Content Overlay */}
+        <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-4 sm:px-6 lg:px-8 z-10">
+          <h1 className="mb-8 tracking-tight leading-tight">
+            <div className="text-base md:text-lg lg:text-xl text-gray-300 font-light mb-4 opacity-90">
+              Welcome to
+            </div>
+            <div className="text-6xl md:text-8xl lg:text-9xl font-black bg-gradient-to-r from-white via-gray-100 to-gray-200 bg-clip-text text-transparent">
+              TechyVerve
+            </div>
+          </h1>
+
+          <p className="text-lg md:text-xl lg:text-2xl text-gray-200 mb-12 max-w-4xl mx-auto leading-relaxed font-light opacity-95">
+            We create innovative software solutions and stunning websites that
+            help businesses{" "}
+            <span className="text-white font-medium">thrive</span> in the digital world
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <button
+              onClick={() => {
+                const element = document.getElementById("projects");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="group relative bg-white text-black px-10 py-4 rounded-xl font-medium text-lg hover:bg-gray-100 transition-all duration-300"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </button>
-          
-          <button
-            onClick={() => {
-              const element = document.getElementById("contact");
-              if (element) {
-                element.scrollIntoView({ behavior: "smooth" });
-              }
-            }}
-            className="group relative border-2 border-gray-300 text-gray-100 px-10 py-4 rounded-xl font-medium text-lg hover:border-white hover:text-white hover:bg-white/10 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl hover:shadow-white/10 backdrop-blur-sm"
-            style={{ 
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: '500',
-              boxShadow: '0 10px 40px rgba(255,255,255,0.05)'
-            }}
-          >
-            Get Started
-          </button>
-        </div>
-        
-        {/* Animated scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-          <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-gray-200 rounded-full mt-2 animate-bounce"></div>
+              View Our Work
+            </button>
+
+            <button
+              onClick={() => setIsPopupOpen(true)}
+              className="group relative border-2 border-gray-300 text-gray-100 px-10 py-4 rounded-xl font-medium text-lg hover:border-white hover:text-white hover:bg-white/10 transition-all duration-300"
+            >
+              Contact Us
+            </button>
+          </div>
+
+          {/* ✅ Popup Modal */}
+          {isPopupOpen && (
+            <Contact onClose={() => setIsPopupOpen(false)} />
+          )}
+
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
+            <div className="w-6 h-10 border-2 border-gray-400 rounded-full flex justify-center">
+              <div className="w-1 h-3 bg-gray-200 rounded-full mt-2 animate-bounce"></div>
+            </div>
           </div>
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes gradientShift {
-          0% { transform: rotate(0deg) scale(1); }
-          50% { transform: rotate(180deg) scale(1.1); }
-          100% { transform: rotate(360deg) scale(1); }
-        }
-        
-        /* Ensure fonts load properly */
-        * {
-          font-display: swap;
-        }
-      `}</style>
-    </div>
-  </>
-);
+    </>
+  );
 };
 
 export default Home;
